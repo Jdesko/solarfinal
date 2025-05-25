@@ -341,7 +341,10 @@
             <div class="current-date" id="currentDate">--/--/----</div>
             <button id="nextDay">Dia Seguinte →</button>
         </div>
-        
+     <div class="chart-controls">
+         <label>Máximo do Gráfico (W): </label>
+         <input type="number" id="yAxisMax" value="5000" min="1000" step="500">
+     </div>   
         <canvas id="energyChart" height="300"></canvas>
         
         <div id="dataTable">
@@ -586,6 +589,10 @@
                             },
                             y: {
                                 title: { display: true, text: 'Potência (W)' }
+                                min: 0, // Valor mínimo fixo em 0
+                                max: 4000, // DEFINA AQUI O VALOR MÁXIMO DESEJADO
+                                ticks: {
+                                stepSize: 1000 // Intervalo entre os valores do eixo Y
                             }
                         },
                         plugins: {
@@ -649,7 +656,7 @@
                         borderinline-size: 2
                     }
                 ];
-                
+                this.chart.options.scales.y.max = 4000; // Novo valor máximo
                 this.chart.update();
             },
             
