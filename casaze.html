@@ -25,36 +25,36 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            min-block-size: 100vh;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 800px;
+            margin-block-end: 20px;
+            inline-size: 100%;
+            max-inline-size: 800px;
         }
         
         .header h1 {
             color: var(--primary);
-            margin-bottom: 5px;
+            margin-block-end: 5px;
         }
         
         .house-monitor {
             position: relative;
-            width: 800px;
-            height: 600px;
+            inline-size: 800px;
+            block-size: 600px;
             background-image: url('assets/img/casa-com-paineis-marcada.jpg');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            margin-bottom: 20px;
+            margin-block-end: 20px;
         }
         
         .energy-circle {
             position: absolute;
-            width: 80px;
-            height: 80px;
+            inline-size: 80px;
+            block-size: 80px;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
@@ -68,7 +68,7 @@
         
         .circle-value {
             font-size: 20px;
-            margin-bottom: 2px;
+            margin-block-end: 2px;
         }
         
         .circle-label {
@@ -77,20 +77,20 @@
         }
         
         .circle-generation {
-            top: 70px;
-            left: 400px;
+            inset-block-start: 70px;
+            inset-inline-start: 400px;
             background-color: var(--generation);
         }
         
         .circle-consumption {
-            top: 360px;
-            left: 265px;
+            inset-block-start: 360px;
+            inset-inline-start: 265px;
             background-color: var(--consumption);
         }
         
         .circle-import {
-            top: 100px;
-            left: 120px;
+            inset-block-start: 100px;
+            inset-inline-start: 120px;
             background-color: var(--import);
         }
         
@@ -99,10 +99,10 @@
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 15px;
-            margin-bottom: 20px;
+            margin-block-end: 20px;
             text-align: center;
-            width: 100%;
-            max-width: 300px;
+            inline-size: 100%;
+            max-inline-size: 300px;
         }
         
         .voltage-header {
@@ -111,7 +111,7 @@
             padding: 8px 15px;
             border-radius: 6px;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-block-end: 15px;
             display: inline-block;
         }
         
@@ -122,8 +122,8 @@
         }
         
         .footer {
-            width: 100%;
-            max-width: 800px;
+            inline-size: 100%;
+            max-inline-size: 800px;
             text-align: center;
         }
         
@@ -135,7 +135,7 @@
         .error-message {
             color: #d32f2f;
             text-align: center;
-            margin-top: 10px;
+            margin-block-start: 10px;
             font-size: 14px;
         }
         
@@ -143,7 +143,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-top: 20px;
+            margin-block-start: 20px;
         }
         
         .refresh-btn {
@@ -175,8 +175,8 @@
         
         /* Estilos para a seção de dados históricos */
         .data-section {
-            width: 800px;
-            margin-top: 40px;
+            inline-size: 800px;
+            margin-block-start: 40px;
             background: white;
             padding: 20px;
             border-radius: 10px;
@@ -186,7 +186,7 @@
         .data-section h2 {
             color: var(--primary);
             text-align: center;
-            margin-bottom: 20px;
+            margin-block-end: 20px;
         }
         
         .date-controls {
@@ -212,20 +212,20 @@
         
         .current-date {
             font-weight: bold;
-            min-width: 120px;
+            min-inline-size: 120px;
             text-align: center;
         }
         
         #dataTable {
-            margin-top: 20px;
-            max-height: 300px;
+            margin-block-start: 20px;
+            max-block-size: 300px;
             overflow-y: auto;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
         
         table {
-            width: 100%;
+            inline-size: 100%;
             border-collapse: collapse;
         }
         
@@ -234,13 +234,13 @@
             color: white;
             padding: 10px;
             position: sticky;
-            top: 0;
+            inset-block-start: 0;
         }
         
         td {
             padding: 8px;
             text-align: center;
-            border-bottom: 1px solid #ddd;
+            border-block-end: 1px solid #ddd;
         }
         
         tr:nth-child(even) {
@@ -251,7 +251,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-top: 20px;
+            margin-block-start: 20px;
         }
         
         .data-btn {
@@ -273,7 +273,7 @@
         
         .message {
             text-align: center;
-            margin-top: 10px;
+            margin-block-start: 10px;
             padding: 10px;
             border-radius: 4px;
             display: none;
@@ -372,7 +372,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
 
     <script>
         // CONFIGURAÇÃO
@@ -477,7 +477,7 @@
                 }
                 
                 // Verifica valores numéricos
-                if (isNaN(parseFloat(emeters[0].power)) return false;
+                if (isNaN(parseFloat(emeters[0].power))) return false;
                 if (isNaN(parseFloat(emeters[1].power))) return false;
                 
                 return true;
@@ -658,7 +658,7 @@
                         borderColor: '#34a853',
                         backgroundColor: 'rgba(52, 168, 83, 0.1)',
                         tension: 0.1,
-                        borderWidth: 2
+                        borderinline-size: 2
                     },
                     {
                         label: 'Consumo',
@@ -666,7 +666,7 @@
                         borderColor: '#fbbc05',
                         backgroundColor: 'rgba(251, 188, 5, 0.1)',
                         tension: 0.1,
-                        borderWidth: 2
+                        borderinline-size: 2
                     },
                     {
                         label: 'Rede Elétrica',
@@ -674,7 +674,7 @@
                         borderColor: '#ea4335',
                         backgroundColor: 'rgba(234, 67, 53, 0.1)',
                         tension: 0.1,
-                        borderWidth: 2
+                        borderinline-size: 2
                     }
                 ];
                 
@@ -756,7 +756,7 @@
                 const timestamp = Date.now();
                 const apiUrl = `https://shelly-96-eu.shelly.cloud/device/status?id=${CONFIG.deviceId}&auth_key=${CONFIG.authKey}&_=${timestamp}`;
                 
-                const response = await fetch(apiUrl);
+                 console.log("Tentando acessar:", apiUrl); // Log para debug
                 
                 if (!response.ok) {
                     throw new Error(`Erro na requisição: ${response.status}`);
