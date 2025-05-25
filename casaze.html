@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Usina Solar - Visualização Casa</title>
+    <style>
+        :root {
+            --primary: #4285f4;
+            --generation: #34a853;    /* verde - produção */
+            --import: #ea4335;        /* vermelho - importação */
+            --consumption: #fbbc05;   /* amarelo - consumo */
+            --positive-flow: #ea4335; /* vermelho */
+            --negative-flow: #34a853; /* verde */
+            --connection-line: #666;   /* cinza para linhas */
+            --text: #202124;
+        }
+        
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .header h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .house-monitor {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background-image: url('assets/img/casa-com-paineis-marcada.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-bottom: 20px;
+        }
+        
+        .energy-circle {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        
+        .circle-value {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+        
+        .circle-label {
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .circle-generation {
+            top: 70px;
+            left: 400px;
+            background-color: var(--generation);
+        }
+        
+        .circle-consumption {
+            top: 360px;
+            left: 265px;
+            background-color: var(--consumption);
+        }
+        
+        .circle-import {
+            top: 100px;
+            left: 120px;
+            background-color: var(--import);
+        }
+        
+        .voltage-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .voltage-header {
+            background-color: #9c27b0;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .voltage-value {
+            font-size: 28px;
+            font-weight: 500;
+            color: #9c27b0;
+        }
+        
+        .footer {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        .last-update {
+            font-size: 14px;
+            color: #9aa0a6;
+        }
+        
+        .error-message {
+            color: #d32f2f;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .refresh-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Estilos para a seção de dados históricos */
+        .data-section {
+            width: 800px;
+            margin-top: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .data-section h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .date-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .date-controls button {
+            padding: 5px 10px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .date-controls button:hover {
+            opacity: 0.9;
+        }
+        
+        .current-date {
+            font-weight: bold;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        #dataTable {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+        }
+        
+        td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .data-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .data-btn {
+            padding: 8px 15px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        #exportData {
+            background-color: var(--generation);
+        }
+        
+        #clearData {
+            background-color: var(--import);
+        }
+        
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Monitoramento Solar Residencial</h1>
+        <p>Fluxo de energia em tempo real</p>
+    </div>
+    
+    <div class="voltage-container">
+        <div class="voltage-header">Voltagem da Rede</div>
+        <div class="voltage-value" id="avgVoltage">--</div>
+    </div>
+    
+    <div class="house-monitor">
+        <div class="energy-circle circle-generation" id="generationCircle">
+            <div class="circle-value" id="generationPower">--</div>
+            <div class="circle-label">Produção Solar</div>
+        </div>
+        
+        <div class="energy-circle circle-consumption" id="consumptionCircle">
+            <div class="circle-value" id="consumptionPower">--</div>
+            <div class="circle-label">Consumo</div>
+        </div>
+        
+        <div class="energy-circle circle-import" id="importCircle">
+            <div class="circle-value" id="importPower">--</div>
+            <div class="circle-label">Rede Elétrica</div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="last-update" id="lastUpdate">
+            Última atualização: --
+        </div>
+        
+        <div id="errorDisplay" class="error-message"></div>
+        
+        <div class="controls">
+            <button class="refresh-btn" id="refreshBtn">
+                <span id="refreshIcon">↻</span>
+                Atualizar
+            </button>
+        </div>
+    </div>
+
+    <div class="data-section">
+        <h2>Histórico de Energia</h2>
+        
+        <div class="date-controls">
+            <button id="prevDay">← Dia Anterior</button>
+            <div class="current-date" id="currentDate">--/--/----</div>
+            <button id="nextDay">Dia Seguinte →</button>
+        </div>
+        
+        <canvas id="energyChart" height="300"></canvas>
+        
+        <div id="dataTable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hora (Portugal)</th>
+                        <th>Produção (W)</th>
+                        <th>Consumo (W)</th>
+                        <th>Rede (W)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Dados serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="data-actions">
+            <button id="exportData" class="data-btn">Exportar Dados</button>
+            <button id="clearData" class="data-btn">Limpar Histórico</button>
+        </div>
+        
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Bibliotecas necessárias -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1"></script>
+
+    <script>
+        // CONFIGURAÇÃO
+        const CONFIG = {
+            deviceId: "c45bbee1fd27",
+            authKey: "MjFkM2IxdWlk87450512E000570046BE7579151D5C48F4FED67642847DD24161500B8A5B0CA7000733819F55FC2C",
+            refreshInterval: 5000,
+            dataCollectionInterval: 300000 // 5 minutos em milissegundos
+        };
+
+        // Elementos da interface
+        const elements = {
+            // Monitoramento em tempo real
+            avgVoltage: document.getElementById('avgVoltage'),
+            importPower: document.getElementById('importPower'),
+            consumptionPower: document.getElementById('consumptionPower'),
+            generationPower: document.getElementById('generationPower'),
+            importCircle: document.getElementById('importCircle'),
+            consumptionCircle: document.getElementById('consumptionCircle'),
+            generationCircle: document.getElementById('generationCircle'),
+            lastUpdate: document.getElementById('lastUpdate'),
+            refreshBtn: document.getElementById('refreshBtn'),
+            refreshIcon: document.getElementById('refreshIcon'),
+            errorDisplay: document.getElementById('errorDisplay'),
+            
+            // Histórico de dados
+            prevDayBtn: document.getElementById('prevDay'),
+            nextDayBtn: document.getElementById('nextDay'),
+            currentDate: document.getElementById('currentDate'),
+            tableBody: document.getElementById('tableBody'),
+            exportBtn: document.getElementById('exportData'),
+            clearBtn: document.getElementById('clearData'),
+            message: document.getElementById('message')
+        };
+
+        // Funções auxiliares
+        const helpers = {
+            formatNumber: (num) => parseFloat(num).toFixed(0),
+            formatVoltage: (num) => parseFloat(num).toFixed(1),
+            
+            formatDateTime: (date) => {
+                return date.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            },
+            
+            formatDate: (date) => {
+                return date.toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            },
+            
+            setLoading: (state) => {
+                if (state) {
+                    elements.refreshIcon.classList.add('loading');
+                    elements.refreshBtn.disabled = true;
+                } else {
+                    elements.refreshIcon.classList.remove('loading');
+                    elements.refreshBtn.disabled = false;
+                }
+            },
+            
+            showError: (message) => {
+                elements.errorDisplay.textContent = message;
+                setTimeout(() => {
+                    elements.errorDisplay.textContent = '';
+                }, 5000);
+            },
+            
+            showMessage: (message, type = 'success') => {
+                elements.message.textContent = message;
+                elements.message.className = `message ${type}`;
+                elements.message.style.display = 'block';
+                
+                setTimeout(() => {
+                    elements.message.style.display = 'none';
+                }, 5000);
+            },
+            
+            resetValues: () => {
+                elements.avgVoltage.textContent = '--';
+                elements.importPower.textContent = '--';
+                elements.consumptionPower.textContent = '--';
+                elements.generationPower.textContent = '--';
+            }
+        };
+
+        // Sistema de histórico de dados
+        const energyHistory = {
+            data: {},
+            currentDate: luxon.DateTime.now().setZone('Europe/Lisbon'),
+            chart: null,
+            collectionInterval: null,
+            
+            init: function() {
+                this.loadFromStorage();
+                this.initChart();
+                this.setupControls();
+                this.loadDay(this.currentDate);
+                this.startDataCollection();
+            },
+            
+            loadFromStorage: function() {
+                const savedData = localStorage.getItem('solarEnergyHistory');
+                if (savedData) {
+                    try {
+                        this.data = JSON.parse(savedData);
+                        
+                        // Converter strings de data para objetos DateTime
+                        Object.keys(this.data).forEach(date => {
+                            this.data[date].forEach(entry => {
+                                entry.timestamp = luxon.DateTime.fromISO(entry.timestamp);
+                            });
+                        });
+                    } catch (e) {
+                        console.error("Erro ao carregar dados:", e);
+                        this.data = {};
+                    }
+                }
+            },
+            
+            saveToStorage: function() {
+                try {
+                    // Converter objetos DateTime para strings antes de salvar
+                    const dataToSave = {};
+                    Object.keys(this.data).forEach(date => {
+                        dataToSave[date] = this.data[date].map(entry => ({
+                            ...entry,
+                            timestamp: entry.timestamp.toISO()
+                        }));
+                    });
+                    
+                    localStorage.setItem('solarEnergyHistory', JSON.stringify(dataToSave));
+                } catch (e) {
+                    console.error("Erro ao salvar dados:", e);
+                }
+            },
+            
+            startDataCollection: function() {
+                // Coleta dados a cada 5 minutos
+                this.collectionInterval = setInterval(() => {
+                    this.collectData();
+                }, CONFIG.dataCollectionInterval);
+                
+                // Coleta imediata ao iniciar
+                this.collectData();
+            },
+            
+            collectData: function() {
+                if (elements.generationPower.textContent === '--') return;
+                
+                const now = luxon.DateTime.now().setZone('Europe/Lisbon');
+                const dateKey = now.toFormat('yyyy-MM-dd');
+                const timeKey = now.toFormat('HH:mm');
+                
+                if (!this.data[dateKey]) {
+                    this.data[dateKey] = [];
+                }
+                
+                // Verifica se já existe registro nos últimos 2 minutos
+                const twoMinutesAgo = now.minus({ minutes: 2 });
+                const recentEntry = this.data[dateKey].find(entry => 
+                    entry.timestamp > twoMinutesAgo
+                );
+                
+                if (!recentEntry) {
+                    // Adiciona novo ponto de dados
+                    this.data[dateKey].push({
+                        timestamp: now,
+                        generation: parseFloat(elements.generationPower.textContent) || 0,
+                        consumption: parseFloat(elements.consumptionPower.textContent) || 0,
+                        grid: parseFloat(elements.importPower.textContent) || 0,
+                        timeLabel: timeKey
+                    });
+                    
+                    // Ordena por timestamp
+                    this.data[dateKey].sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    this.saveToStorage();
+                    
+                    // Se for o dia atual, atualiza o gráfico
+                    if (dateKey === this.currentDate.toFormat('yyyy-MM-dd')) {
+                        this.updateChart();
+                        this.updateTable();
+                    }
+                }
+            },
+            
+            initChart: function() {
+                const ctx = document.getElementById('energyChart').getContext('2d');
+                
+                this.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: [], datasets: [] },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'hour',
+                                    displayFormats: { hour: 'HH:mm' },
+                                    tooltipFormat: 'HH:mm',
+                                    timezone: 'Europe/Lisbon'
+                                },
+                                title: { display: true, text: 'Hora (Portugal)' }
+                            },
+                            y: {
+                                title: { display: true, text: 'Potência (W)' }
+                            }
+                        },
+                        plugins: {
+                            zoom: {
+                                zoom: {
+                                    wheel: { enabled: true },
+                                    pinch: { enabled: true },
+                                    mode: 'xy'
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'xy'
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+            
+            loadDay: function(date) {
+                const dateKey = date.toFormat('yyyy-MM-dd');
+                elements.currentDate.textContent = helpers.formatDate(date);
+                
+                // Inicializa array se não existir
+                if (!this.data[dateKey]) {
+                    this.data[dateKey] = [];
+                }
+                
+                this.updateChart();
+                this.updateTable();
+            },
+            
+            updateChart: function() {
+                const dateKey = this.currentDate.toFormat('yyyy-MM-dd');
+                const dayData = this.data[dateKey] || [];
+                
+                this.chart.data.labels = dayData.map(d => d.timestamp);
+                this.chart.data.datasets = [
+                    {
+                        label: 'Produção Solar',
+                        data: dayData.map(d => d.generation),
+                        borderColor: '#34a853',
+                        backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                        tension: 0.1,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Consumo',
+                        data: dayData.map(d => d.consumption),
+                        borderColor: '#fbbc05',
+                        backgroundColor: 'rgba(251, 188, 5, 0.1)',
+                        tension: 0.1,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Rede Elétrica',
+                        data: dayData.map(d => d.grid),
+                        borderColor: '#ea4335',
+                        backgroundColor: 'rgba(234, 67, 53, 0.1)',
+                        tension: 0.1,
+                        borderWidth: 2
+                    }
+                ];
+                
+                this.chart.update();
+            },
+            
+            updateTable: function() {
+                const dateKey = this.currentDate.toFormat('yyyy-MM-dd');
+                const dayData = this.data[dateKey] || [];
+                
+                elements.tableBody.innerHTML = '';
+                
+                dayData.forEach(entry => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${entry.timeLabel}</td>
+                        <td>${entry.generation.toFixed(0)}</td>
+                        <td>${entry.consumption.toFixed(0)}</td>
+                        <td>${entry.grid.toFixed(0)}</td>
+                    `;
+                    elements.tableBody.appendChild(row);
+                });
+            },
+            
+            exportData: function() {
+                try {
+                    const dataStr = JSON.stringify(this.data, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                    
+                    const exportName = `historico_solar_${this.currentDate.toFormat('yyyy-MM-dd')}.json`;
+                    const linkElement = document.createElement('a');
+                    
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportName);
+                    linkElement.click();
+                    
+                    helpers.showMessage("Dados exportados com sucesso!", "success");
+                } catch (e) {
+                    console.error("Erro ao exportar dados:", e);
+                    helpers.showMessage("Erro ao exportar dados", "error");
+                }
+            },
+            
+            clearData: function() {
+                if (confirm("Tem certeza que deseja limpar TODOS os dados históricos? Esta ação não pode ser desfeita.")) {
+                    this.data = {};
+                    localStorage.removeItem('solarEnergyHistory');
+                    this.loadDay(this.currentDate);
+                    helpers.showMessage("Dados históricos limpos com sucesso", "success");
+                }
+            },
+            
+            setupControls: function() {
+                elements.prevDayBtn.addEventListener('click', () => {
+                    this.currentDate = this.currentDate.minus({ days: 1 });
+                    this.loadDay(this.currentDate);
+                });
+                
+                elements.nextDayBtn.addEventListener('click', () => {
+                    this.currentDate = this.currentDate.plus({ days: 1 });
+                    this.loadDay(this.currentDate);
+                });
+                
+                elements.exportBtn.addEventListener('click', () => {
+                    this.exportData();
+                });
+                
+                elements.clearBtn.addEventListener('click', () => {
+                    this.clearData();
+                });
+            }
+        };
+
+        // Busca os dados do Shelly EM
+        async function fetchData() {
+            helpers.setLoading(true);
+            helpers.resetValues();
+            
+            try {
+                const timestamp = Date.now();
+                const apiUrl = `https://shelly-96-eu.shelly.cloud/device/status?id=${CONFIG.deviceId}&auth_key=${CONFIG.authKey}&_=${timestamp}`;
+                
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Erro na requisição: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data || !data.isok || !data.data || !data.data.device_status) {
+                    throw new Error("Resposta inválida da API");
+                }
+                
+                const emeters = data.data.device_status.emeters;
+                const now = new Date();
+                
+                if (emeters && emeters.length >= 2) {
+                    // Voltagem média
+                    const avgVoltage = (parseFloat(emeters[0].voltage || 0) + parseFloat(emeters[1].voltage || 0)) / 2;
+                    elements.avgVoltage.textContent = helpers.formatVoltage(avgVoltage);
+                    
+                    // Canal 0 - Importação da rede
+                    const importPower = parseFloat(emeters[0].power || 0);
+                    elements.importPower.textContent = helpers.formatNumber(importPower);
+                    
+                    // Canal 1 - Geração solar
+                    const generationPower = parseFloat(emeters[1].power || 0);
+                    elements.generationPower.textContent = helpers.formatNumber(generationPower);
+                    
+                    // Calcula consumo (importação + geração)
+                    const consumptionPower = importPower + generationPower;
+                    elements.consumptionPower.textContent = helpers.formatNumber(consumptionPower);
+                    
+                    // Atualiza cores dos círculos baseado no fluxo
+                    if (importPower < 0) {
+                        // Exportando para rede - verde
+                        elements.importCircle.style.backgroundColor = 'var(--generation)';
+                    } else {
+                        // Importando da rede - vermelho
+                        elements.importCircle.style.backgroundColor = 'var(--import)';
+                    }
+                }
+                
+                elements.lastUpdate.textContent = `Última atualização: ${helpers.formatDateTime(now)}`;
+                
+            } catch (error) {
+                console.error("Erro ao buscar dados:", error);
+                helpers.showError(`Erro: ${error.message}`);
+            } finally {
+                helpers.setLoading(false);
+            }
+        }
+
+        // Configura eventos
+        elements.refreshBtn.addEventListener('click', fetchData);
+        
+        // Atualização automática
+        let intervalId;
+        function startAutoRefresh() {
+            fetchData();
+            intervalId = setInterval(fetchData, CONFIG.refreshInterval);
+        }
+        
+        // Controle de atualização quando a página está visível/oculta
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(intervalId);
+            } else {
+                startAutoRefresh();
+            }
+        });
+        
+        // Inicia o monitoramento
+        document.addEventListener('DOMContentLoaded', () => {
+            startAutoRefresh();
+            energyHistory.init();
+        });
+    </script>
+</body>
+</html>
