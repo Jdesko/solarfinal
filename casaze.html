@@ -25,36 +25,36 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-block-size: 100vh;
+            min-height: 100vh;
         }
         
         .header {
             text-align: center;
-            margin-block-end: 20px;
-            inline-size: 100%;
-            max-inline-size: 800px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
         }
         
         .header h1 {
             color: var(--primary);
-            margin-block-end: 5px;
+            margin-bottom: 5px;
         }
         
         .house-monitor {
             position: relative;
-            inline-size: 800px;
-            block-size: 600px;
+            width: 800px;
+            height: 600px;
             background-image: url('assets/img/casa-com-paineis-marcada.jpg');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            margin-block-end: 20px;
+            margin-bottom: 20px;
         }
         
         .energy-circle {
             position: absolute;
-            inline-size: 80px;
-            block-size: 80px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
@@ -68,7 +68,7 @@
         
         .circle-value {
             font-size: 20px;
-            margin-block-end: 2px;
+            margin-bottom: 2px;
         }
         
         .circle-label {
@@ -77,20 +77,20 @@
         }
         
         .circle-generation {
-            inset-block-start: 70px;
-            inset-inline-start: 400px;
+            top: 70px;
+            left: 400px;
             background-color: var(--generation);
         }
         
         .circle-consumption {
-            inset-block-start: 360px;
-            inset-inline-start: 265px;
+            top: 360px;
+            left: 265px;
             background-color: var(--consumption);
         }
         
         .circle-import {
-            inset-block-start: 100px;
-            inset-inline-start: 120px;
+            top: 100px;
+            left: 120px;
             background-color: var(--import);
         }
         
@@ -99,10 +99,10 @@
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 15px;
-            margin-block-end: 20px;
+            margin-bottom: 20px;
             text-align: center;
-            inline-size: 100%;
-            max-inline-size: 300px;
+            width: 100%;
+            max-width: 300px;
         }
         
         .voltage-header {
@@ -111,7 +111,7 @@
             padding: 8px 15px;
             border-radius: 6px;
             font-weight: bold;
-            margin-block-end: 15px;
+            margin-bottom: 15px;
             display: inline-block;
         }
         
@@ -122,8 +122,8 @@
         }
         
         .footer {
-            inline-size: 100%;
-            max-inline-size: 800px;
+            width: 100%;
+            max-width: 800px;
             text-align: center;
         }
         
@@ -135,7 +135,7 @@
         .error-message {
             color: #d32f2f;
             text-align: center;
-            margin-block-start: 10px;
+            margin-top: 10px;
             font-size: 14px;
         }
         
@@ -143,7 +143,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-block-start: 20px;
+            margin-top: 20px;
         }
         
         .refresh-btn {
@@ -175,8 +175,8 @@
         
         /* Estilos para a seção de dados históricos */
         .data-section {
-            inline-size: 800px;
-            margin-block-start: 40px;
+            width: 800px;
+            margin-top: 40px;
             background: white;
             padding: 20px;
             border-radius: 10px;
@@ -186,7 +186,7 @@
         .data-section h2 {
             color: var(--primary);
             text-align: center;
-            margin-block-end: 20px;
+            margin-bottom: 20px;
         }
         
         .date-controls {
@@ -212,20 +212,20 @@
         
         .current-date {
             font-weight: bold;
-            min-inline-size: 120px;
+            min-width: 120px;
             text-align: center;
         }
         
         #dataTable {
-            margin-block-start: 20px;
-            max-block-size: 300px;
+            margin-top: 20px;
+            max-height: 300px;
             overflow-y: auto;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
         
         table {
-            inline-size: 100%;
+            width: 100%;
             border-collapse: collapse;
         }
         
@@ -234,13 +234,13 @@
             color: white;
             padding: 10px;
             position: sticky;
-            inset-block-start: 0;
+            top: 0;
         }
         
         td {
             padding: 8px;
             text-align: center;
-            border-block-end: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
         }
         
         tr:nth-child(even) {
@@ -251,7 +251,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-block-start: 20px;
+            margin-top: 20px;
         }
         
         .data-btn {
@@ -273,7 +273,7 @@
         
         .message {
             text-align: center;
-            margin-block-start: 10px;
+            margin-top: 10px;
             padding: 10px;
             border-radius: 4px;
             display: none;
@@ -340,7 +340,8 @@
             <button id="prevDay">← Dia Anterior</button>
             <div class="current-date" id="currentDate">--/--/----</div>
             <button id="nextDay">Dia Seguinte →</button>
-        </div>   
+        </div>
+        
         <canvas id="energyChart" height="300"></canvas>
         
         <div id="dataTable">
@@ -371,7 +372,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1"></script>
 
     <script>
         // CONFIGURAÇÃO
@@ -379,7 +380,9 @@
             deviceId: "c45bbee1fd27",
             authKey: "MjFkM2IxdWlk87450512E000570046BE7579151D5C48F4FED67642847DD24161500B8A5B0CA7000733819F55FC2C",
             refreshInterval: 5000,
-            dataCollectionInterval: 300000 // 5 minutos em milissegundos
+            dataCollectionInterval: 300000, // 5 minutos em milissegundos
+            maxRetries: 3, // Número máximo de tentativas de reconexão
+            retryDelay: 2000 // Tempo entre tentativas em ms
         };
 
         // Elementos da interface
@@ -460,6 +463,24 @@
                 elements.importPower.textContent = '--';
                 elements.consumptionPower.textContent = '--';
                 elements.generationPower.textContent = '--';
+            },
+            
+            // Função para verificar se os dados são válidos
+            validateData: (data) => {
+                if (!data || !data.isok || !data.data || !data.data.device_status) {
+                    return false;
+                }
+                
+                const emeters = data.data.device_status.emeters;
+                if (!emeters || emeters.length < 2) {
+                    return false;
+                }
+                
+                // Verifica valores numéricos
+                if (isNaN(parseFloat(emeters[0].power)) return false;
+                if (isNaN(parseFloat(emeters[1].power))) return false;
+                
+                return true;
             }
         };
 
@@ -584,11 +605,12 @@
                                 title: { display: true, text: 'Hora (Portugal)' }
                             },
                             y: {
-                                title: { display: true, text: 'Potência (W)' }
-                                min: 0, // Valor mínimo fixo em 0
-                                max: 4000, // DEFINA AQUI O VALOR MÁXIMO DESEJADO
+                                title: { display: true, text: 'Potência (W)' },
+                                min: 0,
+                                max: 5000,  // Limite máximo de 5000W
                                 ticks: {
-                                stepSize: 1000 // Intervalo entre os valores do eixo Y
+                                    stepSize: 500
+                                }
                             }
                         },
                         plugins: {
@@ -600,7 +622,10 @@
                                 },
                                 pan: {
                                     enabled: true,
-                                    mode: 'xy'
+                                    mode: 'xy',
+                                    limits: {
+                                        y: { min: 0, max: 5000 }  // Limita o zoom/pan também
+                                    }
                                 }
                             }
                         }
@@ -633,7 +658,7 @@
                         borderColor: '#34a853',
                         backgroundColor: 'rgba(52, 168, 83, 0.1)',
                         tension: 0.1,
-                        borderinline-size: 2
+                        borderWidth: 2
                     },
                     {
                         label: 'Consumo',
@@ -641,7 +666,7 @@
                         borderColor: '#fbbc05',
                         backgroundColor: 'rgba(251, 188, 5, 0.1)',
                         tension: 0.1,
-                        borderinline-size: 2
+                        borderWidth: 2
                     },
                     {
                         label: 'Rede Elétrica',
@@ -649,10 +674,10 @@
                         borderColor: '#ea4335',
                         backgroundColor: 'rgba(234, 67, 53, 0.1)',
                         tension: 0.1,
-                        borderinline-size: 2
+                        borderWidth: 2
                     }
                 ];
-                this.chart.options.scales.y.max = 4000; // Novo valor máximo
+                
                 this.chart.update();
             },
             
@@ -723,14 +748,15 @@
             }
         };
 
-        // Busca os dados do Shelly EM
-        async function fetchData() {
+        // Busca os dados do Shelly EM com sistema de retentativa
+        async function fetchData(retryCount = 0) {
             helpers.setLoading(true);
             
             try {
-               
+                const timestamp = Date.now();
+                const apiUrl = `https://shelly-96-eu.shelly.cloud/device/status?id=${CONFIG.deviceId}&auth_key=${CONFIG.authKey}&_=${timestamp}`;
                 
-                const response = await fetch(`https://shelly-96-eu.shelly.cloud/device/status?id=${CONFIG.deviceId}&auth_key=${CONFIG.authKey}`);
+                const response = await fetch(apiUrl);
                 
                 if (!response.ok) {
                     throw new Error(`Erro na requisição: ${response.status}`);
@@ -738,8 +764,9 @@
                 
                 const data = await response.json();
                 
-                if (!data || !data.isok || !data.data || !data.data.device_status) {
-                    throw new Error("Resposta inválida da API");
+                // Valida os dados recebidos
+                if (!helpers.validateData(data)) {
+                    throw new Error("Dados recebidos são inválidos");
                 }
                 
                 const emeters = data.data.device_status.emeters;
@@ -776,14 +803,24 @@
                 
             } catch (error) {
                 console.error("Erro ao buscar dados:", error);
-                helpers.showError(`Erro: ${error.message}`);
+                
+                // Se ainda houver tentativas, tenta novamente
+                if (retryCount < CONFIG.maxRetries) {
+                    helpers.showError(`Erro: ${error.message}. Tentando novamente... (${retryCount + 1}/${CONFIG.maxRetries})`);
+                    
+                    await new Promise(resolve => setTimeout(resolve, CONFIG.retryDelay));
+                    return fetchData(retryCount + 1);
+                } else {
+                    helpers.showError(`Erro: ${error.message}. Máximo de tentativas alcançado.`);
+                    helpers.resetValues();
+                }
             } finally {
                 helpers.setLoading(false);
             }
         }
 
         // Configura eventos
-        elements.refreshBtn.addEventListener('click', fetchData);
+        elements.refreshBtn.addEventListener('click', () => fetchData());
         
         // Atualização automática
         let intervalId;
